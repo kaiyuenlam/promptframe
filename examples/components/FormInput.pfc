@@ -1,0 +1,242 @@
+<template>
+  <div class="form-input" :class="{ 'has-error': hasError, 'is-focused': isFocused }">
+    <label v-if="label" class="input-label" :for="inputId">
+      {{ label }}
+      <span v-if="required" class="required">*</span>
+    </label>
+    <div class="input-wrapper">
+      <input 
+        :id="inputId"
+        :type="type"
+        :placeholder="placeholder"
+        :value="value"
+        :disabled="disabled"
+        :required="required"
+        class="input-field"
+        @input="handleInput"
+        @focus="handleFocus"
+        @blur="handleBlur"
+      />
+      <div v-if="icon" class="input-icon">{{ icon }}</div>
+    </div>
+    <div v-if="hasError && errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+    <div v-if="helpText && !hasError" class="help-text">
+      {{ helpText }}
+    </div>
+  </div>
+</template>
+
+<script lang="typescript">
+interface Props {
+  label?: string;
+  type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url';
+  placeholder?: string;
+  value?: string;
+  disabled?: boolean;
+  required?: boolean;
+  icon?: string;
+  helpText?: string;
+  errorMessage?: string;
+  hasError?: boolean;
+  onChange?: (value: string) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  validation?: (value: string) => boolean | string;
+}
+
+// Generate unique ID for accessibility
+const inputId = `input-${Math.random().toString(36).substr(2, 9)}`;
+let isFocused = false;
+let currentValue = props.value || '';
+let validationError = '';
+
+// Update display values
+function updateDisplay() {
+  const input = document.getElementById(inputId) as HTMLInputElement;
+  if (input) {
+    input.value = currentValue;
+  }
+  
+  // Update error state
+  const container = document.querySelector('.form-input');
+  if (container) {
+    container.classList.toggle('has-error', props.hasError || !!validationError);
+  }
+  
+  // Update error message
+  const errorElement = document.querySelector('.error-message');
+  if (errorElement) {
+    errorElement.textContent = props.errorMessage || validationError;
+  }
+}
+
+// Handle input changes
+function handleInput(event: Event) {
+  const target = event.target as HTMLInputElement;
+  currentValue = target.value;
+  
+  // Run validation if provided
+  if (props.validation) {
+    const result = props.validation(currentValue);
+    if (typeof result === 'string') {
+      validationError = result;
+    } else if (!result) {
+      validationError = 'Invalid input';
+    } else {
+      validationError = '';
+    }
+  }
+  
+  updateDisplay();
+  
+  if (props.onChange) {
+    props.onChange(currentValue);
+  }
+}
+
+// Handle focus events
+function handleFocus() {
+  isFocused = true;
+  const container = document.querySelector('.form-input');
+  if (container) {
+    container.classList.add('is-focused');
+  }
+  
+  if (props.onFocus) {
+    props.onFocus();
+  }
+}
+
+// Handle blur events
+function handleBlur() {
+  isFocused = false;
+  const container = document.querySelector('.form-input');
+  if (container) {
+    container.classList.remove('is-focused');
+  }
+  
+  if (props.onBlur) {
+    props.onBlur();
+  }
+}
+
+// Set up event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById(inputId);
+  if (input) {
+    input.addEventListener('input', handleInput);
+    input.addEventListener('focus', handleFocus);
+    input.addEventListener('blur', handleBlur);
+  }
+  
+  updateDisplay();
+});
+
+console.log('FormInput component initialized with props:', props);
+</script>
+
+<style scoped>
+.form-input {
+  margin-bottom: 1rem;
+  font-family: 'Arial', sans-serif;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.required {
+  color: #ef4444;
+  margin-left: 0.25rem;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #374151;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.input-field:disabled {
+  background-color: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.input-field::placeholder {
+  color: #9ca3af;
+}
+
+.input-icon {
+  position: absolute;
+  right: 1rem;
+  color: #6b7280;
+  pointer-events: none;
+  font-size: 1.25rem;
+}
+
+.has-error .input-field {
+  border-color: #ef4444;
+}
+
+.has-error .input-field:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.is-focused .input-label {
+  color: #3b82f6;
+}
+
+.error-message {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+}
+
+.error-message::before {
+  content: '⚠️';
+  margin-right: 0.5rem;
+}
+
+.help-text {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .input-field {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+  }
+}
+</style> 

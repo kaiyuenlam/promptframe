@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptFrame Component Library Examples</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .component-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            transition: transform 0.2s ease;
+        }
+        
+        .component-card:hover {
+            transform: translateY(-4px);
+        }
+        
+        .component-title {
+            font-size: 1.5rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+        
+        .component-description {
+            color: #718096;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .component-demo {
+            margin-bottom: 1.5rem;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .control-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        
+        .form-demo {
+            max-width: 300px;
+        }
+        
+        .toast-controls {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #4299e1;
+        }
+        
+        .code-snippet {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧩 PromptFrame Component Library</h1>
+        
+        <div class="component-grid">
+            <!-- Form Input Component -->
+            <div class="component-card">
+                <h2 class="component-title">Form Input</h2>
+                <p class="component-description">
+                    A versatile form input component with validation, icons, and accessibility features.
+                    Supports different input types, error states, and custom validation.
+                </p>
+                
+                <div class="component-demo">
+                    <div class="form-demo" id="form-input-demo">
+                        <!-- Form inputs will be rendered here -->
+                    </div>
+                </div>
+                
+                <div class="code-snippet">
+<pre>pfc.render('FormInput', {
+  label: 'Email Address',
+  type: 'email',
+  placeholder: 'Enter your email',
+  required: true,
+  icon: '📧',
+  helpText: 'We will never share your email',
+  validation: (value) => 
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+});</pre>
+                </div>
+            </div>
+            
+            <!-- Modal Component -->
+            <div class="component-card">
+                <h2 class="component-title">Modal Dialog</h2>
+                <p class="component-description">
+                    A flexible modal component with customizable headers, footers, and size options.
+                    Includes backdrop click handling and keyboard navigation.
+                </p>
+                
+                <div class="component-demo">
+                    <div class="demo-controls">
+                        <button class="control-btn btn-primary" onclick="showModal('simple')">
+                            Simple Modal
+                        </button>
+                        <button class="control-btn btn-primary" onclick="showModal('confirmation')">
+                            Confirmation
+                        </button>
+                        <button class="control-btn btn-primary" onclick="showModal('large')">
+                            Large Modal
+                        </button>
+                    </div>
+                    <div id="modal-demo">
+                        <!-- Modals will be rendered here -->
+                    </div>
+                </div>
+                
+                <div class="code-snippet">
+<pre>pfc.render('Modal', {
+  isOpen: true,
+  title: 'Confirm Action',
+  message: 'Are you sure you want to proceed?',
+  showFooter: true,
+  confirmText: 'Yes, Continue',
+  cancelText: 'Cancel',
+  onConfirm: () => console.log('Confirmed!'),
+  onCancel: () => console.log('Cancelled!')
+});</pre>
+                </div>
+            </div>
+            
+            <!-- Toast Component -->
+            <div class="component-card">
+                <h2 class="component-title">Toast Notifications</h2>
+                <p class="component-description">
+                    Elegant toast notifications with multiple types, positions, and auto-dismiss functionality.
+                    Perfect for user feedback and status updates.
+                </p>
+                
+                <div class="component-demo">
+                    <div class="toast-controls">
+                        <div class="demo-controls">
+                            <button class="control-btn btn-primary" onclick="showToast('success')">
+                                Success
+                            </button>
+                            <button class="control-btn btn-secondary" onclick="showToast('error')">
+                                Error
+                            </button>
+                            <button class="control-btn btn-secondary" onclick="showToast('warning')">
+                                Warning
+                            </button>
+                            <button class="control-btn btn-secondary" onclick="showToast('info')">
+                                Info
+                            </button>
+                        </div>
+                        <p style="margin: 0; font-size: 0.875rem; color: #6b7280;">
+                            Click buttons above to show toast notifications in different positions
+                        </p>
+                    </div>
+                    <div id="toast-demo">
+                        <!-- Toasts will be rendered here -->
+                    </div>
+                </div>
+                
+                <div class="code-snippet">
+<pre>pfc.render('Toast', {
+  type: 'success',
+  title: 'Success!',
+  message: 'Your changes have been saved.',
+  duration: 5000,
+  dismissible: true,
+  position: 'top-right',
+  onDismiss: () => console.log('Toast dismissed')
+});</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../dist/core/index.js"></script>
+    <script>
+        // Component data (would normally be compiled from .pfc files)
+        const components = {
+            FormInput: {
+                template: `<div class="form-input"><label class="input-label">{{ label }}<span v-if="required" class="required">*</span></label><div class="input-wrapper"><input class="input-field" :type="type" :placeholder="placeholder" :required="required" /><div v-if="icon" class="input-icon">{{ icon }}</div></div><div class="help-text">{{ helpText }}</div></div>`,
+                style: `.form-input { margin-bottom: 1rem; font-family: 'Arial', sans-serif; } .input-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem; } .required { color: #ef4444; margin-left: 0.25rem; } .input-wrapper { position: relative; } .input-field { width: 100%; padding: 0.75rem 1rem; border: 2px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #374151; box-sizing: border-box; transition: border-color 0.2s; } .input-field:focus { outline: none; border-color: #3b82f6; } .input-icon { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: #6b7280; } .help-text { margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280; }`,
+                scopeId: 'form-input'
+            },
+            
+            Modal: {
+                template: `<div v-if="isOpen" class="modal-overlay"><div class="modal-container"><div class="modal-header"><h2 class="modal-title">{{ title }}</h2><button class="close-button">✕</button></div><div class="modal-body"><div class="modal-message">{{ message }}</div></div><div class="modal-footer"><button class="btn btn-secondary">{{ cancelText }}</button><button class="btn btn-primary">{{ confirmText }}</button></div></div></div>`,
+                style: `.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; animation: fadeIn 0.3s ease; } .modal-container { background: white; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-width: 500px; width: 90%; animation: slideIn 0.3s ease; } .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid #e5e7eb; } .modal-title { margin: 0; font-size: 1.5rem; color: #111827; } .close-button { background: none; border: none; font-size: 1.5rem; color: #6b7280; cursor: pointer; padding: 0.25rem; border-radius: 6px; } .close-button:hover { background: #f3f4f6; } .modal-body { padding: 1.5rem; } .modal-message { color: #374151; line-height: 1.6; } .modal-footer { display: flex; gap: 0.75rem; justify-content: flex-end; padding: 1.5rem; border-top: 1px solid #e5e7eb; } .btn { padding: 0.625rem 1.25rem; border-radius: 8px; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: none; } .btn-primary { background: #3b82f6; color: white; } .btn-secondary { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } @keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }`,
+                scopeId: 'modal'
+            },
+            
+            Toast: {
+                template: `<div class="toast toast-{{ type }}"><div class="toast-icon">{{ getIcon() }}</div><div class="toast-content"><div class="toast-title">{{ title }}</div><div class="toast-message">{{ message }}</div></div><button class="toast-dismiss">✕</button></div>`,
+                style: `.toast { display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-width: 400px; position: fixed; z-index: 1050; animation: slideInRight 0.3s ease; } .toast-success { background: #f0f9ff; border-left: 4px solid #10b981; color: #065f46; } .toast-error { background: #fef2f2; border-left: 4px solid #ef4444; color: #991b1b; } .toast-warning { background: #fffbeb; border-left: 4px solid #f59e0b; color: #92400e; } .toast-info { background: #f0f9ff; border-left: 4px solid #3b82f6; color: #1e40af; } .toast-icon { font-size: 1.25rem; } .toast-content { flex: 1; } .toast-title { font-weight: 600; font-size: 0.875rem; margin-bottom: 0.25rem; } .toast-message { font-size: 0.875rem; line-height: 1.5; } .toast-dismiss { background: none; border: none; color: inherit; cursor: pointer; padding: 0.25rem; border-radius: 4px; opacity: 0.7; } .toast-dismiss:hover { opacity: 1; background: rgba(0, 0, 0, 0.1); } @keyframes slideInRight { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }`,
+                scopeId: 'toast'
+            }
+        };
+
+        // Initialize PromptFrame
+        if (typeof PromptFrame !== 'undefined') {
+            const pfc = new PromptFrame();
+            
+            // Register components
+            Object.entries(components).forEach(([name, component]) => {
+                pfc.registerComponent(name, component);
+            });
+            
+            // Render form input examples
+            pfc.render('FormInput', {
+                label: 'Email Address',
+                type: 'email',
+                placeholder: 'Enter your email',
+                required: true,
+                icon: '📧',
+                helpText: 'We will never share your email'
+            }, { target: 'form-input-demo' });
+            
+            pfc.render('FormInput', {
+                label: 'Password',
+                type: 'password',
+                placeholder: 'Enter your password',
+                required: true,
+                icon: '🔒',
+                helpText: 'Must be at least 8 characters'
+            }, { target: 'form-input-demo' });
+            
+        } else {
+            document.body.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: white;">
+                    <h1>⚠️ PromptFrame Not Found</h1>
+                    <p>Please compile the PromptFrame library first:</p>
+                    <pre style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 6px; display: inline-block;">
+npm run build
+                    </pre>
+                </div>
+            `;
+        }
+
+        // Modal functionality
+        window.showModal = function(type) {
+            console.log(`Showing ${type} modal - this would open a modal in a real implementation`);
+        };
+        
+        // Toast functionality  
+        window.showToast = function(type) {
+            console.log(`Showing ${type} toast - this would show a toast notification in a real implementation`);
+        };
+    </script>
+</body>
+</html> 

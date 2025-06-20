@@ -1,0 +1,181 @@
+<template>
+  <div class="counter">
+    <div class="counter-display">
+      <span class="count">{{ count }}</span>
+      <span class="label">{{ label }}</span>
+    </div>
+    <div class="counter-controls">
+      <button class="btn btn-decrement" id="decrement-btn">-</button>
+      <button class="btn btn-reset" id="reset-btn">Reset</button>
+      <button class="btn btn-increment" id="increment-btn">+</button>
+    </div>
+    <div class="counter-info" v-if="showInfo">
+      <p>Step: {{ step }}</p>
+      <p v-if="min !== undefined">Min: {{ min }}</p>
+      <p v-if="max !== undefined">Max: {{ max }}</p>
+    </div>
+  </div>
+</template>
+
+<script lang="typescript">
+interface Props {
+  initialCount?: number;
+  step?: number;
+  min?: number;
+  max?: number;
+  label?: string;
+  showInfo?: boolean;
+  onChange?: (value: number) => void;
+}
+
+// Initialize state
+let currentCount = props.initialCount || 0;
+const step = props.step || 1;
+const min = props.min;
+const max = props.max;
+
+// Update the count display
+function updateDisplay() {
+  const countElement = document.querySelector('.count');
+  if (countElement) {
+    countElement.textContent = currentCount.toString();
+  }
+  
+  // Call onChange callback if provided
+  if (props.onChange) {
+    props.onChange(currentCount);
+  }
+}
+
+// Increment function
+function increment() {
+  const newValue = currentCount + step;
+  if (max === undefined || newValue <= max) {
+    currentCount = newValue;
+    updateDisplay();
+  }
+}
+
+// Decrement function
+function decrement() {
+  const newValue = currentCount - step;
+  if (min === undefined || newValue >= min) {
+    currentCount = newValue;
+    updateDisplay();
+  }
+}
+
+// Reset function
+function reset() {
+  currentCount = props.initialCount || 0;
+  updateDisplay();
+}
+
+// Add event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  const incrementBtn = document.getElementById('increment-btn');
+  const decrementBtn = document.getElementById('decrement-btn');
+  const resetBtn = document.getElementById('reset-btn');
+  
+  if (incrementBtn) incrementBtn.addEventListener('click', increment);
+  if (decrementBtn) decrementBtn.addEventListener('click', decrement);
+  if (resetBtn) resetBtn.addEventListener('click', reset);
+});
+
+console.log('Counter component initialized with count:', currentCount);
+</script>
+
+<style scoped>
+.counter {
+  display: inline-block;
+  padding: 1.5rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+  min-width: 200px;
+}
+
+.counter-display {
+  margin-bottom: 1rem;
+}
+
+.count {
+  display: block;
+  font-size: 3rem;
+  font-weight: bold;
+  color: #2d3748;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.counter-controls {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.btn-increment {
+  background: #48bb78;
+  color: white;
+}
+
+.btn-increment:hover {
+  background: #38a169;
+  transform: translateY(-1px);
+}
+
+.btn-decrement {
+  background: #f56565;
+  color: white;
+}
+
+.btn-decrement:hover {
+  background: #e53e3e;
+  transform: translateY(-1px);
+}
+
+.btn-reset {
+  background: #cbd5e0;
+  color: #4a5568;
+}
+
+.btn-reset:hover {
+  background: #a0aec0;
+  transform: translateY(-1px);
+}
+
+.counter-info {
+  font-size: 0.875rem;
+  color: #718096;
+  text-align: left;
+  background: #f7fafc;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border-left: 3px solid #4299e1;
+}
+
+.counter-info p {
+  margin: 0.25rem 0;
+}
+</style> 

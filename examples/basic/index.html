@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptFrame Basic Examples</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 3rem;
+            font-size: 2.5rem;
+        }
+        
+        .example-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .example-title {
+            font-size: 1.5rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+        
+        .example-description {
+            color: #718096;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .example-demo {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            min-height: 150px;
+        }
+        
+        .code-note {
+            background: #f7fafc;
+            border-left: 4px solid #4299e1;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .code-note pre {
+            margin: 0;
+            font-size: 0.875rem;
+            color: #2d3748;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 PromptFrame Basic Examples</h1>
+        
+        <div class="example-section">
+            <h2 class="example-title">Hello World Component</h2>
+            <p class="example-description">
+                A simple component demonstrating basic prop interpolation and conditional rendering.
+                This component shows how to use TypeScript interfaces, scoped CSS, and event handling.
+            </p>
+            <div class="example-demo" id="hello-world-demo">
+                <!-- HelloWorld components will be rendered here -->
+            </div>
+            <div class="code-note">
+                <pre>// Usage:
+pfc.render('HelloWorld', {
+  title: 'Welcome to PromptFrame',
+  message: 'This is your first component!',
+  showButton: true,
+  buttonText: 'Click Me!',
+  onButtonClick: () => console.log('Hello World clicked!')
+});</pre>
+            </div>
+        </div>
+        
+        <div class="example-section">
+            <h2 class="example-title">Counter Component</h2>
+            <p class="example-description">
+                An interactive counter demonstrating state management, event handling, and prop validation.
+                Shows how to create stateful components with min/max constraints and custom step values.
+            </p>
+            <div class="example-demo" id="counter-demo">
+                <!-- Counter components will be rendered here -->
+            </div>
+            <div class="code-note">
+                <pre>// Usage:
+pfc.render('Counter', {
+  initialCount: 0,
+  step: 1,
+  min: 0,
+  max: 10,
+  label: 'Count',
+  showInfo: true,
+  onChange: (value) => console.log('Counter value:', value)
+});</pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../dist/core/index.js"></script>
+    <script>
+        // Example component data (in real usage, these would be compiled from .pfc files)
+        const helloWorldComponent = {
+            "template": "<div class=\"hello-world\"><h1>{{ title }}</h1><p class=\"message\">{{ message }}</p><button class=\"btn\" v-if=\"showButton\">{{ buttonText }}</button></div>",
+            "script": "console.log('HelloWorld component initialized with props:', props);const button = document.querySelector('.btn');if (button && props.onButtonClick) {button.addEventListener('click', props.onButtonClick);}",
+            "style": ".hello-world { text-align: center; padding: 2rem; font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); } .hello-world h1 { margin: 0 0 1rem 0; font-size: 2.5rem; font-weight: 700; } .message { font-size: 1.2rem; margin-bottom: 1.5rem; opacity: 0.9; } .btn { background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.3); color: white; padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; } .btn:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }",
+            "scopeId": "hello-world"
+        };
+        
+        const counterComponent = {
+            "template": "<div class=\"counter\"><div class=\"counter-display\"><span class=\"count\">{{ count }}</span><span class=\"label\">{{ label }}</span></div><div class=\"counter-controls\"><button class=\"btn btn-decrement\" id=\"decrement-btn\">-</button><button class=\"btn btn-reset\" id=\"reset-btn\">Reset</button><button class=\"btn btn-increment\" id=\"increment-btn\">+</button></div><div class=\"counter-info\" v-if=\"showInfo\"><p>Step: {{ step }}</p><p v-if=\"min !== undefined\">Min: {{ min }}</p><p v-if=\"max !== undefined\">Max: {{ max }}</p></div></div>",
+            "script": "let currentCount = props.initialCount || 0;const step = props.step || 1;const min = props.min;const max = props.max;function updateDisplay() {const countElement = document.querySelector('.count');if (countElement) {countElement.textContent = currentCount.toString();}if (props.onChange) {props.onChange(currentCount);}}function increment() {const newValue = currentCount + step;if (max === undefined || newValue <= max) {currentCount = newValue;updateDisplay();}}function decrement() {const newValue = currentCount - step;if (min === undefined || newValue >= min) {currentCount = newValue;updateDisplay();}}function reset() {currentCount = props.initialCount || 0;updateDisplay();}document.addEventListener('DOMContentLoaded', () => {const incrementBtn = document.getElementById('increment-btn');const decrementBtn = document.getElementById('decrement-btn');const resetBtn = document.getElementById('reset-btn');if (incrementBtn) incrementBtn.addEventListener('click', increment);if (decrementBtn) decrementBtn.addEventListener('click', decrement);if (resetBtn) resetBtn.addEventListener('click', reset);});console.log('Counter component initialized with count:', currentCount);",
+            "style": ".counter { display: inline-block; padding: 1.5rem; border: 2px solid #e2e8f0; border-radius: 12px; background: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); font-family: 'Arial', sans-serif; text-align: center; min-width: 200px; } .counter-display { margin-bottom: 1rem; } .count { display: block; font-size: 3rem; font-weight: bold; color: #2d3748; line-height: 1; margin-bottom: 0.5rem; } .label { font-size: 0.875rem; color: #718096; text-transform: uppercase; letter-spacing: 0.05em; } .counter-controls { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; } .btn { padding: 0.5rem 1rem; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; transition: all 0.2s ease; font-weight: 500; } .btn-increment { background: #48bb78; color: white; } .btn-increment:hover { background: #38a169; transform: translateY(-1px); } .btn-decrement { background: #f56565; color: white; } .btn-decrement:hover { background: #e53e3e; transform: translateY(-1px); } .btn-reset { background: #cbd5e0; color: #4a5568; } .btn-reset:hover { background: #a0aec0; transform: translateY(-1px); } .counter-info { font-size: 0.875rem; color: #718096; text-align: left; background: #f7fafc; padding: 0.75rem; border-radius: 6px; border-left: 3px solid #4299e1; } .counter-info p { margin: 0.25rem 0; }",
+            "scopeId": "counter"
+        };
+
+        // Initialize PromptFrame (assuming it's available globally)
+        if (typeof PromptFrame !== 'undefined') {
+            const pfc = new PromptFrame();
+            
+            // Register components
+            pfc.registerComponent('HelloWorld', helloWorldComponent);
+            pfc.registerComponent('Counter', counterComponent);
+            
+            // Render HelloWorld examples
+            pfc.render('HelloWorld', {
+                title: 'Welcome to PromptFrame!',
+                message: 'This is your first component demonstration.',
+                showButton: true,
+                buttonText: 'Say Hello!',
+                onButtonClick: () => alert('Hello from PromptFrame! 👋')
+            }, { target: 'hello-world-demo' });
+            
+            // Render Counter examples
+            pfc.render('Counter', {
+                initialCount: 0,
+                step: 1,
+                label: 'Basic Counter',
+                showInfo: false,
+                onChange: (value) => console.log('Basic counter value:', value)
+            }, { target: 'counter-demo' });
+            
+            pfc.render('Counter', {
+                initialCount: 5,
+                step: 2,
+                min: 0,
+                max: 20,
+                label: 'Advanced Counter',
+                showInfo: true,
+                onChange: (value) => console.log('Advanced counter value:', value)
+            }, { target: 'counter-demo' });
+            
+        } else {
+            // Fallback if PromptFrame is not available
+            document.body.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #e53e3e;">
+                    <h1>⚠️ PromptFrame Not Found</h1>
+                    <p>Please compile the PromptFrame library first:</p>
+                    <pre style="background: #f7fafc; padding: 1rem; border-radius: 6px; display: inline-block;">
+npm run build
+                    </pre>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html> 

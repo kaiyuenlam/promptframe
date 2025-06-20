@@ -1,0 +1,68 @@
+<template>
+  <div class="hello-world">
+    <h1>{{ title }}</h1>
+    <p class="message">{{ message }}</p>
+    <button class="btn" v-if="showButton">{{ buttonText }}</button>
+  </div>
+</template>
+
+<script lang="typescript">
+// Define the props interface for type safety
+interface Props {
+  title: string;
+  message: string;
+  showButton?: boolean;
+  buttonText?: string;
+  onButtonClick?: () => void;
+}
+
+// Component logic - access props and DOM
+console.log('HelloWorld component initialized with props:', props);
+
+// Add event listener if button is present and callback is provided
+const button = document.querySelector('.btn');
+if (button && props.onButtonClick) {
+  button.addEventListener('click', props.onButtonClick);
+}
+</script>
+
+<style scoped>
+/* Scoped styles - these won't affect other components */
+.hello-world {
+  text-align: center;
+  padding: 2rem;
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.hello-world h1 {
+  margin: 0 0 1rem 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.message {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+}
+
+.btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+</style> 

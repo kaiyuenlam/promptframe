@@ -1,0 +1,293 @@
+<template>
+  <div v-if="isOpen" class="modal-overlay" @click="handleOverlayClick">
+    <div class="modal-container" @click.stop>
+      <div class="modal-header" v-if="title || showCloseButton">
+        <h2 v-if="title" class="modal-title">{{ title }}</h2>
+        <button v-if="showCloseButton" class="close-button" @click="handleClose">
+          ✕
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div v-if="message" class="modal-message">{{ message }}</div>
+        <slot></slot>
+      </div>
+      
+      <div class="modal-footer" v-if="showFooter">
+        <button v-if="cancelText" class="btn btn-secondary" @click="handleCancel">
+          {{ cancelText }}
+        </button>
+        <button v-if="confirmText" class="btn btn-primary" @click="handleConfirm">
+          {{ confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="typescript">
+interface Props {
+  isOpen: boolean;
+  title?: string;
+  message?: string;
+  showCloseButton?: boolean;
+  showFooter?: boolean;
+  confirmText?: string;
+  cancelText?: string;
+  closeOnOverlayClick?: boolean;
+  onClose?: () => void;
+  onConfirm?: () => void;
+  onCancel?: () => void;
+  size?: 'small' | 'medium' | 'large' | 'fullscreen';
+}
+
+// Handle overlay click
+function handleOverlayClick() {
+  if (props.closeOnOverlayClick !== false) {
+    handleClose();
+  }
+}
+
+// Handle close action
+function handleClose() {
+  if (props.onClose) {
+    props.onClose();
+  }
+}
+
+// Handle confirm action
+function handleConfirm() {
+  if (props.onConfirm) {
+    props.onConfirm();
+  }
+  handleClose();
+}
+
+// Handle cancel action
+function handleCancel() {
+  if (props.onCancel) {
+    props.onCancel();
+  }
+  handleClose();
+}
+
+// Handle escape key
+function handleKeyDown(event: KeyboardEvent) {
+  if (event.key === 'Escape' && props.isOpen) {
+    handleClose();
+  }
+}
+
+// Prevent body scroll when modal is open
+function updateBodyScroll() {
+  if (props.isOpen) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+// Set up event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('keydown', handleKeyDown);
+  
+  // Set up click handlers
+  const overlay = document.querySelector('.modal-overlay');
+  const closeButton = document.querySelector('.close-button');
+  const confirmButton = document.querySelector('.btn-primary');
+  const cancelButton = document.querySelector('.btn-secondary');
+  
+  if (overlay) overlay.addEventListener('click', handleOverlayClick);
+  if (closeButton) closeButton.addEventListener('click', handleClose);
+  if (confirmButton) confirmButton.addEventListener('click', handleConfirm);
+  if (cancelButton) cancelButton.addEventListener('click', handleCancel);
+  
+  updateBodyScroll();
+});
+
+// Clean up on component destruction
+window.addEventListener('beforeunload', () => {
+  document.body.style.overflow = '';
+});
+
+console.log('Modal component initialized with props:', props);
+</script>
+
+<style scoped>
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: slideIn 0.3s ease;
+  font-family: 'Arial', sans-serif;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 1.5rem 0 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 1rem;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 6px;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.modal-body {
+  padding: 0 1.5rem;
+  overflow-y: auto;
+  max-height: calc(90vh - 200px);
+}
+
+.modal-message {
+  color: #374151;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 1rem;
+}
+
+.btn {
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  outline: none;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+/* Size variants */
+.modal-container.small {
+  max-width: 300px;
+}
+
+.modal-container.large {
+  max-width: 800px;
+}
+
+.modal-container.fullscreen {
+  max-width: 95vw;
+  max-height: 95vh;
+  width: 95vw;
+  height: 95vh;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .modal-overlay {
+    padding: 0.5rem;
+  }
+  
+  .modal-container {
+    max-width: 100%;
+    margin: 0;
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .modal-footer {
+    flex-direction: column-reverse;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}
+</style> 

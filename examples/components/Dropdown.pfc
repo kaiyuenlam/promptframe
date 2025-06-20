@@ -1,0 +1,440 @@
+<template>
+  <div class="dropdown" :class="{ 'dropdown-open': isOpen, 'dropdown-disabled': disabled }">
+    <label v-if="label" class="dropdown-label">
+      {{ label }}
+      <span v-if="required" class="required">*</span>
+    </label>
+    
+    <div class="dropdown-trigger" @click="toggleDropdown">
+      <span class="dropdown-value">
+        {{ selectedLabel || placeholder }}
+      </span>
+      <span class="dropdown-arrow">{{ isOpen ? '▲' : '▼' }}</span>
+    </div>
+    
+    <div v-if="isOpen" class="dropdown-menu">
+      <div v-if="searchable" class="dropdown-search">
+        <input 
+          type="text" 
+          class="search-input"
+          :placeholder="searchPlaceholder"
+          @input="handleSearch"
+          @click.stop
+        />
+      </div>
+      
+      <div class="dropdown-options">
+        <div 
+          v-for="option in filteredOptions" 
+          :key="option.value"
+          class="dropdown-option"
+          :class="{ 
+            'option-selected': option.value === selectedValue,
+            'option-disabled': option.disabled 
+          }"
+          @click="selectOption(option)"
+        >
+          <span class="option-label">{{ option.label }}</span>
+          <span v-if="option.value === selectedValue" class="option-check">✓</span>
+        </div>
+        
+        <div v-if="filteredOptions.length === 0" class="dropdown-empty">
+          {{ searchTerm ? 'No results found' : 'No options available' }}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="typescript">
+interface Option {
+  value: string | number;
+  label: string;
+  disabled?: boolean;
+}
+
+interface Props {
+  label?: string;
+  placeholder?: string;
+  searchPlaceholder?: string;
+  options: Option[];
+  selectedValue?: string | number;
+  disabled?: boolean;
+  required?: boolean;
+  searchable?: boolean;
+  clearable?: boolean;
+  onChange?: (value: string | number, option: Option) => void;
+  onSearch?: (searchTerm: string) => void;
+}
+
+let isOpen = false;
+let searchTerm = '';
+let selectedValue = props.selectedValue || null;
+let filteredOptions = props.options || [];
+
+// Get the label for the selected value
+const selectedLabel = computed(() => {
+  if (!selectedValue) return '';
+  const option = props.options.find(opt => opt.value === selectedValue);
+  return option ? option.label : '';
+});
+
+// Filter options based on search term
+function updateFilteredOptions() {
+  if (!searchTerm) {
+    filteredOptions = props.options;
+  } else {
+    filteredOptions = props.options.filter(option =>
+      option.label.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
+  
+  // Update the dropdown menu
+  const optionsContainer = document.querySelector('.dropdown-options');
+  if (optionsContainer) {
+    optionsContainer.innerHTML = '';
+    
+    if (filteredOptions.length === 0) {
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'dropdown-empty';
+      emptyDiv.textContent = searchTerm ? 'No results found' : 'No options available';
+      optionsContainer.appendChild(emptyDiv);
+    } else {
+      filteredOptions.forEach(option => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'dropdown-option';
+        if (option.value === selectedValue) optionDiv.classList.add('option-selected');
+        if (option.disabled) optionDiv.classList.add('option-disabled');
+        
+        optionDiv.innerHTML = `
+          <span class="option-label">${option.label}</span>
+          ${option.value === selectedValue ? '<span class="option-check">✓</span>' : ''}
+        `;
+        
+        optionDiv.addEventListener('click', () => selectOption(option));
+        optionsContainer.appendChild(optionDiv);
+      });
+    }
+  }
+}
+
+// Toggle dropdown open/close
+function toggleDropdown() {
+  if (props.disabled) return;
+  
+  isOpen = !isOpen;
+  const dropdown = document.querySelector('.dropdown');
+  if (dropdown) {
+    dropdown.classList.toggle('dropdown-open', isOpen);
+  }
+  
+  // Focus search input if opened and searchable
+  if (isOpen && props.searchable) {
+    setTimeout(() => {
+      const searchInput = document.querySelector('.search-input') as HTMLInputElement;
+      if (searchInput) {
+        searchInput.focus();
+      }
+    }, 100);
+  }
+}
+
+// Select an option
+function selectOption(option: Option) {
+  if (option.disabled) return;
+  
+  selectedValue = option.value;
+  isOpen = false;
+  searchTerm = '';
+  
+  // Update UI
+  const dropdown = document.querySelector('.dropdown');
+  const valueSpan = document.querySelector('.dropdown-value');
+  
+  if (dropdown) dropdown.classList.remove('dropdown-open');
+  if (valueSpan) valueSpan.textContent = option.label;
+  
+  // Reset search
+  const searchInput = document.querySelector('.search-input') as HTMLInputElement;
+  if (searchInput) {
+    searchInput.value = '';
+  }
+  
+  updateFilteredOptions();
+  
+  if (props.onChange) {
+    props.onChange(option.value, option);
+  }
+}
+
+// Handle search input
+function handleSearch(event: Event) {
+  const target = event.target as HTMLInputElement;
+  searchTerm = target.value;
+  updateFilteredOptions();
+  
+  if (props.onSearch) {
+    props.onSearch(searchTerm);
+  }
+}
+
+// Close dropdown when clicking outside
+function handleClickOutside(event: Event) {
+  const dropdown = document.querySelector('.dropdown');
+  if (dropdown && !dropdown.contains(event.target as Node)) {
+    isOpen = false;
+    dropdown.classList.remove('dropdown-open');
+  }
+}
+
+// Set up event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  const trigger = document.querySelector('.dropdown-trigger');
+  const searchInput = document.querySelector('.search-input');
+  
+  if (trigger) {
+    trigger.addEventListener('click', toggleDropdown);
+  }
+  
+  if (searchInput) {
+    searchInput.addEventListener('input', handleSearch);
+    searchInput.addEventListener('click', (e) => e.stopPropagation());
+  }
+  
+  document.addEventListener('click', handleClickOutside);
+  
+  // Initialize filtered options
+  updateFilteredOptions();
+  
+  // Set initial selected value display
+  const valueSpan = document.querySelector('.dropdown-value');
+  if (valueSpan && selectedValue) {
+    const option = props.options.find(opt => opt.value === selectedValue);
+    if (option) {
+      valueSpan.textContent = option.label;
+    }
+  }
+});
+
+console.log('Dropdown component initialized with props:', props);
+</script>
+
+<style scoped>
+.dropdown {
+  position: relative;
+  font-family: 'Arial', sans-serif;
+  margin-bottom: 1rem;
+}
+
+.dropdown-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.required {
+  color: #ef4444;
+  margin-left: 0.25rem;
+}
+
+.dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 2.5rem;
+  box-sizing: border-box;
+}
+
+.dropdown-trigger:hover {
+  border-color: #9ca3af;
+}
+
+.dropdown-open .dropdown-trigger {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.dropdown-disabled .dropdown-trigger {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.dropdown-disabled .dropdown-trigger:hover {
+  border-color: #d1d5db;
+}
+
+.dropdown-value {
+  flex: 1;
+  text-align: left;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-value:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+}
+
+.dropdown-arrow {
+  color: #6b7280;
+  font-size: 0.75rem;
+  transition: transform 0.2s ease;
+  margin-left: 0.5rem;
+}
+
+.dropdown-open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 2px solid #d1d5db;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 200px;
+  overflow: hidden;
+  animation: slideDown 0.2s ease;
+}
+
+.dropdown-search {
+  padding: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  box-sizing: border-box;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.dropdown-options {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.dropdown-option:last-child {
+  border-bottom: none;
+}
+
+.dropdown-option:hover {
+  background: #f9fafb;
+}
+
+.option-selected {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.option-selected:hover {
+  background: #dbeafe;
+}
+
+.option-disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+  background: #f9fafb;
+}
+
+.option-disabled:hover {
+  background: #f9fafb;
+}
+
+.option-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.option-check {
+  color: #10b981;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+.dropdown-empty {
+  padding: 1rem;
+  text-align: center;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar styling */
+.dropdown-options::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdown-options::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.dropdown-options::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.dropdown-options::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .dropdown-trigger {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+  }
+  
+  .dropdown-option {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+  }
+}
+</style> 
